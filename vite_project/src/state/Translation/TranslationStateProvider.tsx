@@ -1,11 +1,11 @@
 import {type ReactNode, useMemo} from "react";
 import {LocalTranslationStateContext} from "./TranslationState.tsx";
-import type {StoreFinderTranslationsConfig} from "../../domain/store.types.ts";
 import {createTranslator} from "../../lib/translate.ts";
+import type {GoogleReviewsTranslationsConfig} from "../../domain/googlereviews.types.ts";
 
 interface TranslationStateProviderProps {
     children: ReactNode;
-    translations: StoreFinderTranslationsConfig;
+    translations: GoogleReviewsTranslationsConfig;
 }
 
 const LocalStateProvider = LocalTranslationStateContext.Provider;
