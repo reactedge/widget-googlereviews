@@ -1,22 +1,30 @@
-import {WIDGET_ID} from "./mountWidget.tsx";
-import {loadContract} from "./widget-runtime/lib/contractLoader.ts";
-import {activity} from "./activity";
 import type {
     GoogleReviewsWidgetConfig,
     ReactEdgeRuntimeConfig,
-    ResolvedGoogleReviewsConfig
+    WidgetConfig
 } from "./domain/googlereviews.types.ts";
+import type {WidgetActivity} from "./activity";
 
-export async function readWidgetConfig(
-    hostElement: HTMLElement
-): Promise<ResolvedGoogleReviewsConfig> {
+export const WIDGET_ID = 'googlereviews';
 
-    const contract = await loadContract(hostElement);
+export interface RawWidgetConfig {
+    data: {
+        country: string;
+        title: string;
+    };
+    integration: {
+        requires: ('googleMaps')[];
+    };
+}
 
-    const runtime = readIntegrationConfig();
-    const resolved = resolveGoogleReviewsConfig(contract, runtime);
+export function readWidgetConfig(
+    rawConfig: RawWidgetConfig,
+    runtimeConfig: ReactEdgeRuntimeConfig,
+    activity: WidgetActivity
+): WidgetConfig {
+    const resolved = resolveGoogleReviewsConfig(rawConfig, runtimeConfig);
 
-    activity('bootstrap', 'Config resolved', {
+    activity.log('bootstrap', 'Config resolved', {
         data: resolved.data,
         integrations: resolved.integrations,
         translations: resolved.translations
@@ -49,7 +57,7 @@ export function readIntegrationConfig(): ReactEdgeRuntimeConfig {
 export function resolveGoogleReviewsConfig(
     widget: GoogleReviewsWidgetConfig,
     runtime: ReactEdgeRuntimeConfig
-): ResolvedGoogleReviewsConfig {
+): WidgetConfig {
 
     if (
         widget.integration?.requires?.includes('googleMaps') &&

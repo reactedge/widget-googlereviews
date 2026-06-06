@@ -10,6 +10,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     environment: reactedge
+    env:
+      WIDGET_NAME: googlereviews
 
     steps:
       - name: Checkout
@@ -26,12 +28,9 @@ jobs:
 
       - name: Build widget
         working-directory: vite_project
-        run: npm run build
-
-      - name: Verify artifact exists
         run: |
-          VERSION=$(node -p "require('./vite_project/package.json').version")
-          test -f "www/widget-googlereviews@${VERSION}.iife.js"
+          mkdir -p ../www
+          npm run build
 
       - name: Setup SSH
         run: |
@@ -46,15 +45,34 @@ jobs:
 
           ssh-keyscan -H "${{ secrets.WIDGET_SSH_HOST }}" >> ~/.ssh/known_hosts
 
+      - name: Prepare artifact
+        id: prepare_artifact
+        run: |
+          chmod +x scripts/build-widget.sh
+          ./scripts/build-widget.sh ${WIDGET_NAME}
+
       - name: Publish artifact
         run: |
-          VERSION=$(node -p "require('./vite_project/package.json').version")        
+          DEST="/var/www/widgets/${WIDGET_NAME}"
+
           ssh ${{ secrets.WIDGET_SSH_USER }}@${{ secrets.WIDGET_SSH_HOST }} \
-            "mkdir -p /var/www/widgets/googlereviews"
-          rsync -av \
-            --chown=www-data:www-data \
-            www/widget-googlereviews@${VERSION}.iife.js* \
-            ${{ secrets.WIDGET_SSH_USER }}@${{ secrets.WIDGET_SSH_HOST }}:/var/www/widgets/googlereviews/
-          rsync -avz \
-            www/cdn/ \
-            ${{ secrets.WIDGET_SSH_USER }}@${{ secrets.WIDGET_SSH_HOST }}:/var/www/widgets/googlereviews/cdn/
+          "mkdir -p $DEST"
+          
+          FILE="${{ steps.prepare_artifact.outputs.file }}"
+          
+          if [ -z "$FILE" ]; then
+            echo "ERROR: file output is empty"
+            exit 1
+          fi
+          
+          rsync -av --chown=www-data:www-data \
+            "$FILE" \
+            "www/widget-${WIDGET_NAME}.manifest.json" \
+            ${{ secrets.WIDGET_SSH_USER }}@${{ secrets.WIDGET_SSH_HOST }}:$DEST/
+
+      - name: Publish SSR widget source
+        env:
+          SSH_USER: ${{ secrets.WIDGET_SSH_USER }}
+          SSH_HOST: ${{ secrets.WIDGET_SSH_HOST }}
+        run: |
+          bash scripts/deploy-ssr-widget.sh $WIDGET_NAME

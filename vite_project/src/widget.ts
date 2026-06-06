@@ -1,9 +1,14 @@
-import { mountWidget } from "./mountWidget";
+import {mountWidget} from "./mountWidget.tsx";
+import {WIDGET_ID, type RawWidgetConfig} from "./Config.ts";
 
-class GoogleReviewsWidget extends HTMLElement {
-    connectedCallback() {
-        mountWidget(this);
-    }
+import type {ReactEdgeRuntimeConfig} from "./domain/googlereviews.types.ts";
+
+const mount = async (el: HTMLElement, config: RawWidgetConfig, runtimeConfig: ReactEdgeRuntimeConfig) => {
+    await mountWidget(el, config, runtimeConfig)
 }
 
-customElements.define("googlereviews-widget", GoogleReviewsWidget);
+const api = { mount };
+
+(window as any)[`ReactEdge_${WIDGET_ID}`] = api;
+
+export { mount };

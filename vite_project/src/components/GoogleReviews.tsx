@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { LoadScript } from "@react-google-maps/api";
 import {useSystemState} from "../state/System/useSystemState.ts";
-import type {ResolvedGoogleReviewsConfig} from "../domain/googlereviews.types.ts";
+import type {WidgetConfig} from "../domain/googlereviews.types.ts";
 
 type Review = {
     author: string;
@@ -17,7 +17,7 @@ type PlacesData = {
 };
 
 type Props = {
-    config: ResolvedGoogleReviewsConfig
+    config: WidgetConfig
 }
 
 export const GoogleReviews = ({ config }: Props) => {

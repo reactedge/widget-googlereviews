@@ -1,10 +1,10 @@
 import {type ReactNode} from "react";
 import {LocalSystemStateContext} from "./SystemState.tsx";
-import type {ResolvedGoogleReviewsConfig} from "../../domain/googlereviews.types.ts";
+import type {WidgetConfig} from "../../domain/googlereviews.types.ts";
 
 interface SystemStateProviderProps {
     children: ReactNode;
-    config: ResolvedGoogleReviewsConfig;
+    config: WidgetConfig;
 }
 
 const LocalStateProvider = LocalSystemStateContext.Provider;

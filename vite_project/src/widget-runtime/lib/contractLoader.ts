@@ -1,21 +1,18 @@
-import {activity} from "../../activity";
+export interface WidgetRegistryEntry {
+    src?: string;
+    integrity?: string;
+    cdn?: string;
+}
 
-export async function loadContract(hostElement: HTMLElement) {
-    const contractUrl = hostElement.getAttribute("data-contract");
+export type WidgetRegistry = Record<string, WidgetRegistryEntry>;
 
-    if (!contractUrl) {
-        throw new Error("Missing data-contract attribute");
+export async function loadContractByName(name: string, registry: WidgetRegistry) {
+    const entry = registry[name];
+
+    if (!entry?.cdn) {
+        throw new Error(`No contract for ${name}`);
     }
 
-    const response = await fetch(contractUrl);
-
-    if (!response.ok) {
-        activity('bootstrap', 'Config error', {res: response});
-
-        throw new Error(`Failed to load contract: ${response.status}`);
-    }
-
-    const json = await response.json();
-
-    return json;
+    const res = await fetch(entry.cdn);
+    return res.json();
 }

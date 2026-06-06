@@ -3,6 +3,8 @@
 /* -------------------- */
 
 
+import type {RawWidgetConfig} from "../Config.ts";
+
 export interface GoogleReviewsWidgetConfig {
     readonly data: GoogleReviewsDataConfig;
     readonly integration?: {
@@ -40,7 +42,7 @@ export type GoogleReviewsTranslationsConfig = Record<string, string> | undefined
 /* Resolved Config      */
 /* -------------------- */
 
-export interface ResolvedGoogleReviewsConfig {
+export interface WidgetConfig {
     readonly data: GoogleReviewsDataConfig;
     readonly integrations: ReactEdgeRuntimeIntegrations;
     readonly translations: GoogleReviewsTranslationsConfig
